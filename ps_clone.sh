@@ -41,19 +41,19 @@ else
     echo "... Done";
 
   echo "Dumping the source database";
-    mysqldump -u christophe -p --add-drop-database --routines  --databases prestashop$SAN_SOURCE > $MAIN_FOLDER/tools/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    mysqldump -u christophe -p --add-drop-database --routines  --databases prestashop$SAN_SOURCE > $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
   echo "Changing the database name";
-    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/" $MAIN_FOLDER/tools/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
   echo "Changing the prestashop url";
-    sed -i "s/staging.manoecrea.com/test.manoecrea.com/" $MAIN_FOLDER/tools/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/staging.manoecrea.com/test.manoecrea.com/" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done";
 
   echo "Importing the new database";
-    mysql -u christophe -p < $MAIN_FOLDER/tools/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    mysql -u christophe -p < $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
   echo "Granting the permissions to prestashop";
@@ -73,7 +73,7 @@ else
     echo "... Done.";
 
   echo "Cleaning mysql dump";
-      rm $MAIN_FOLDER/tools/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+      rm $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
       echo "... Done.";
 
   echo "Don't forget to reload apache to update the symlinks cache"
