@@ -37,7 +37,7 @@ else
     echo "... Done";
 
   echo "Config Edit";
-    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/" $MAIN_FOLDER/versions/$DEST/app/config/parameters.php
+    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/g" $MAIN_FOLDER/versions/$DEST/app/config/parameters.php
     echo "... Done";
 
   echo "Dumping the source database";
@@ -45,11 +45,11 @@ else
     echo "... Done.";
 
   echo "Changing the database name";
-    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
   echo "Changing the prestashop url";
-    sed -i "s/staging.manoecrea.com/test.manoecrea.com/" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/staging.manoecrea.com/test.manoecrea.com/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done";
 
   echo "Importing the new database";
