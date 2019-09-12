@@ -60,6 +60,10 @@ else
     mysql -u christophe -p -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER ON prestashop"$SAN_DEST".* TO 'prestashop'@'localhost';"
     echo "... Done.";
 
+  echo "Changing the htaccess";
+    sed -i "s/www.centrale-biblique.com/staging.centrale-biblique.com/g" $MAIN_FOLDER/versions/$DEST/.htaccess
+    echo "... Done";
+
   echo "Updating the symlink";
     ln -sfn $MAIN_FOLDER/versions/$DEST $MAIN_FOLDER/staging
     echo "... Done";
