@@ -20,21 +20,15 @@ then
   echo "$MAIN_FOLDER/versions/$DEST  directory already exists!"
   exit -1
 else
-  echo "Starting the copy of $SOURCE to $DEST";
-    cp -Rdp $MAIN_FOLDER/versions/$SOURCE $MAIN_FOLDER/versions/$DEST/
+  echo "Activating the maintenance mode on production"
+    mysql -u christophe -p -e 'UPDATE `ps_configuration` SET `value` = NULL WHERE `ps_configuration`.`id_configuration` = 28;' prestashop$SAN_SOURCE
     echo "... Done.";
-
-  echo "Cleaning old prestashop cache ($DEST)";
-    find $MAIN_FOLDER/versions/$DEST/cache ! -name 'index.php' -type f -exec rm -f {} +
-    echo "... Done";
-
-  echo "Cleaning old prestashop img cache ($DEST)";
-    find $MAIN_FOLDER/versions/$DEST/img/tmp ! -name 'index.php' -type f -exec rm -f {} +
-    echo "... Done";
-
-  echo "Cleaning old prestashop /var/ cache ($DEST)";
-    rm -rf $MAIN_FOLDER/versions/$DEST/var/cache
-    echo "... Done";
+    
+  echo "Starting the copy of $SOURCE to $DEST";
+    rsync -a $MAIN_FOLDER/versions/$SOURCE/ $MAIN_FOLDER/versions/$DEST/ --exclude /img --exclude /var/cache --exclude /var/logs --exclude /cache
+    rsync -a --include '*/' --include 'index.php' --exclude '*' $MAIN_FOLDER/versions/$SOURCE/cache $MAIN_FOLDER/versions/$DEST/
+    ln -sfn $MAIN_FOLDER/versions/$SOURCE/img $MAIN_FOLDER/versions/$DEST/img
+    echo "... Done.";
 
   echo "Config Edit";
     sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/g" $MAIN_FOLDER/versions/$DEST/app/config/parameters.php
@@ -44,12 +38,16 @@ else
     mysqldump -u christophe -p --add-drop-database --routines  --databases prestashop$SAN_SOURCE > $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
+  echo "Deactivating the maintenance mode on production"
+    mysql -u christophe -p -e 'UPDATE `ps_configuration` SET `value` = '1' WHERE `ps_configuration`.`id_configuration` = 28;' prestashop$SAN_SOURCE
+    echo "... Done.";
+
   echo "Changing the database name";
     sed -i "s/prestashop$SAN_SOURCE/prestashop$SAN_DEST/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done.";
 
   echo "Changing the prestashop url";
-    sed -i "s/www.manoecrea.com/staging.manoecrea.com/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/www.centrale-biblique.com/staging.centrale-biblique.com/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done";
 
   echo "Importing the new database";
@@ -57,7 +55,7 @@ else
     echo "... Done.";
 
   echo "Granting the permissions to prestashop";
-    mysql -u christophe -p -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER ON prestashop"$SAN_DEST".* TO 'prestashop'@'localhost';"
+    mysql -u christophe -p -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, SHOW VIEW  ON prestashop"$SAN_DEST".* TO 'prestashop'@'localhost';"
     echo "... Done.";
 
   echo "Changing the htaccess";
@@ -67,14 +65,6 @@ else
   echo "Updating the symlink";
     ln -sfn $MAIN_FOLDER/versions/$DEST $MAIN_FOLDER/staging
     echo "... Done";
-
-  echo "Fixing the directories permissions";
-    find $MAIN_FOLDER/versions/$DEST -type d -exec chmod 775 {} \;
-    echo "... Done";
-
-  echo "Fixing the files permissions";
-    find $MAIN_FOLDER/versions/$DEST -type f -exec chmod 664 {} \;
-    echo "... Done.";
 
   echo "Cleaning mysql dump";
       rm $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
