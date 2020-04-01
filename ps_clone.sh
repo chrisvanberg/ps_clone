@@ -72,3 +72,4 @@ else
       echo "... Done.";
 
   echo "Don't forget to reload apache to update the symlinks cache"
+fi
