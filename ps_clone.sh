@@ -1,11 +1,12 @@
 #!/bin/bash
-while getopts d:s:p: option
+while getopts d:s:p:u: option
 do
 case "${option}"
 in
 d) DEST=${OPTARG};;
 s) SOURCE=${OPTARG};;
 p) MAIN_FOLDER=${OPTARG};;
+u) URL=${OPTARG};;
 esac
 done
 
@@ -23,7 +24,7 @@ else
   echo "Activating the maintenance mode on production"
     mysql -u christophe -p -e 'UPDATE `ps_configuration` SET `value` = NULL WHERE `ps_configuration`.`id_configuration` = 28;' prestashop$SAN_SOURCE
     echo "... Done.";
-    
+
   echo "Starting the copy of $SOURCE to $DEST";
     rsync -a $MAIN_FOLDER/versions/$SOURCE/ $MAIN_FOLDER/versions/$DEST/ --exclude /img --exclude /var/cache --exclude /var/logs --exclude /cache
     rsync -a --include '*/' --include 'index.php' --exclude '*' $MAIN_FOLDER/versions/$SOURCE/cache $MAIN_FOLDER/versions/$DEST/
@@ -59,7 +60,7 @@ else
     echo "... Done.";
 
   echo "Changing the htaccess";
-    sed -i "s/www.centrale-biblique.com/staging.centrale-biblique.com/g" $MAIN_FOLDER/versions/$DEST/.htaccess
+    sed -i "s/www.${URL}.com/staging.${URL}.com/g" $MAIN_FOLDER/versions/$DEST/.htaccess
     echo "... Done";
 
   echo "Updating the symlink";
