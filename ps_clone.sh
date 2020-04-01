@@ -48,7 +48,7 @@ else
     echo "... Done.";
 
   echo "Changing the prestashop url";
-    sed -i "s/www.centrale-biblique.com/staging.centrale-biblique.com/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
+    sed -i "s/www.${URL}.com/staging.${URL}.com/g" $MAIN_FOLDER/tools/ps_clone/prestashop-$SAN_SOURCE-$SAN_DEST.sql
     echo "... Done";
 
   echo "Importing the new database";
